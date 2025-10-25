@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Concert } from './Concert.entity';
+import { Concert } from './concert.entity';
 
 export enum TransactionAction {
   RESERVE = 'RESERVE',
