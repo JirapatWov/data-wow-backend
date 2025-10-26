@@ -1,73 +1,183 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Concert Reservation System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS-based REST API for managing concert reservations.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Quick Start
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+### Step 1: Start MySQL with Docker
 
 ```bash
-$ npm install
+docker run -d \
+  --name mysql-server \
+  -e MYSQL_ROOT_PASSWORD=StrongPass123! \
+  -p 3306:3306 \
+  mysql:8.0
 ```
 
-## Running the app
+### Step 2: Create Database
+
+Connect to MySQL and create database:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker exec -it mysql-server mysql -uroot -pStrongPass123!
 ```
 
-## Test
+```sql
+CREATE DATABASE test;
+EXIT;
+```
+
+### Step 3: Setup Environment Variables
+
+Create `.env` file in root directory:
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=StrongPass123!
+DB_NAME=test
+```
+
+### Step 4: Install Dependencies
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Support
+### Step 5: Run Application
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run start:dev
+```
 
-## Stay in touch
+The application will:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Start on `http://localhost:4000`
+- Auto-sync database and create tables
+- API base path: `http://localhost:4000/api`
 
-## License
+## Architecture
 
-Nest is [MIT licensed](LICENSE).
+### Project Structure
+
+```
+src/
+├── admin/                      # Admin module
+│   ├── admin.controller.ts     # Admin endpoints
+│   ├── admin.service.ts        # Admin business logic
+│   ├── admin.module.ts         # Admin module definition
+│   └── dto/                    # Data Transfer Objects
+│       ├── request.dto.ts      # Request DTOs
+│       └── response.dto.ts     # Response DTOs
+├── user/                       # User module
+│   ├── user.controller.ts      # User endpoints
+│   ├── user.service.ts         # User business logic
+│   ├── user.module.ts          # User module definition
+│   └── dto/                    # Data Transfer Objects
+│       ├── request.dto.ts      # Request DTOs
+│       └── response.dto.ts     # Response DTOs
+├── entities/                   # TypeORM entities
+│   ├── concert.entity.ts       # Concert entity
+│   └── transaction.entity.ts   # Transaction entity
+├── interceptor/                # Global interceptors
+│   ├── logging.interceptor.ts  # Request/response logging
+│   ├── transform.interceptor.ts # Response transformation
+│   └── serialize.interceptor.ts # Data serialization
+├── app.module.ts               # Root application module
+├── main.ts                     # Application entry point
+└── dbConfig.ts                 # Database configuration
+```
+
+### Design Pattern
+
+**Layered Architecture**:
+
+- **Controllers**: Handle HTTP requests
+- **Services**: Business logic
+- **Repositories**: Database operations
+- **DTOs**: Data validation
+
+## API Endpoints
+
+### Admin APIs (`/api/admin`)
+
+- `GET /concerts` - Get all concerts
+- `POST /create-concert` - Create concert
+- `DELETE /:id` - Delete concert
+- `GET /history` - View transactions
+- `GET /totals` - Get statistics
+
+### User APIs (`/api/user`)
+
+- `GET /concerts` - View concerts
+- `POST /reserve` - Reserve concert
+- `POST /cancel` - Cancel reservation
+- `GET /my-concert?username=xxx` - My reservations
+
+## Running Tests
+
+### Run all tests
+
+```bash
+npm run test
+```
+
+### Run with coverage
+
+```bash
+npm run test:cov
+```
+
+### Run specific test
+
+```bash
+npm test -- admin.controller.spec.ts
+npm test -- user.service.spec.ts
+```
+
+## Libraries Used
+
+### Core
+
+- `@nestjs/common` - NestJS framework
+- `@nestjs/typeorm` - Database ORM
+- `mysql2` - MySQL driver
+
+### Validation
+
+- `class-validator` - DTO validation
+- `class-transformer` - Data transformation
+
+### Testing
+
+- `jest` - Testing framework
+- `@nestjs/testing` - NestJS test utilities
+
+## Database Schema
+
+**Concert Table**:
+
+- id, name, detail, number_of_seats, reserved, created_at
+
+**Transaction Table**:
+
+- id, concert_id, username, action (RESERVE/CANCEL), created_at
+
+## Example Request
+
+```bash
+# Create concert
+POST http://localhost:4000/api/admin/create-concert
+{
+  "name": "Summer Festival",
+  "detail": "Amazing concert",
+  "numberOfSeats": 1000
+}
+
+# Reserve concert
+POST http://localhost:4000/api/user/reserve
+{
+  "concertId": 1
+}
+```
