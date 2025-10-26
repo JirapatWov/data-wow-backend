@@ -7,7 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Concert } from 'src/entities/concert.entity';
-import { Transaction } from 'src/entities/transaction.entity';
+import {
+  Transaction,
+  TransactionAction,
+} from 'src/entities/transaction.entity';
 import { CreateConcertDto } from './dto/request.dto';
 
 @Injectable()
@@ -38,6 +41,7 @@ export class AdminService {
       concert.name = createConcertDto.name;
       concert.detail = createConcertDto.detail;
       concert.number_of_seats = createConcertDto.numberOfSeats;
+      concert.reserved = 0;
 
       await this.concertRepository.save(concert);
 
@@ -61,5 +65,32 @@ export class AdminService {
       relations: { concert: true },
     });
     return transactions;
+  }
+
+  async getConcertTotals() {
+    const [seatsRow, reservedRow, cancelRow] = await Promise.all([
+      this.concertRepository
+        .createQueryBuilder('c')
+        .select('COALESCE(SUM(c.number_of_seats), 0)', 'total')
+        .getRawOne(),
+
+      this.transactionRepository
+        .createQueryBuilder('t')
+        .select('COUNT(*)', 'total')
+        .where('t.action = :action', { action: TransactionAction.RESERVE })
+        .getRawOne(),
+
+      this.transactionRepository
+        .createQueryBuilder('t')
+        .select('COUNT(*)', 'total')
+        .where('t.action = :action', { action: TransactionAction.CANCEL })
+        .getRawOne(),
+    ]);
+
+    return {
+      totalSeats: Number(seatsRow?.total ?? 0),
+      totalReserved: Number(reservedRow?.total ?? 0),
+      totalCancel: Number(cancelRow?.total ?? 0),
+    };
   }
 }

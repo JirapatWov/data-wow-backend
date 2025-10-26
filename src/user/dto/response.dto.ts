@@ -16,6 +16,9 @@ export class ConcertResponseDto {
   @Expose({ name: 'reserved' })
   reserved: string;
 
+  @Expose()
+  isReserved: string;
+
   @Expose({ name: 'created_at' })
   createdAt: boolean;
 }

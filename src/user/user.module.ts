@@ -4,11 +4,10 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { Concert } from 'src/entities/concert.entity';
 import { Transaction } from 'src/entities/transaction.entity';
-import { AdminService } from 'src/admin/admin.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Concert, Transaction])],
-  providers: [UserService, AdminService],
+  providers: [UserService],
   controllers: [UserController],
 })
 export class UserModule {}

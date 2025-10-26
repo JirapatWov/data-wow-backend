@@ -15,15 +15,12 @@ import { AdminService } from 'src/admin/admin.service';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly adminService: AdminService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get('concerts')
   @Serialize(ConcertResponseDto)
   async getConcerts() {
-    return await this.adminService.getConcerts();
+    return await this.userService.getConcerts();
   }
 
   @Post('reserve')
@@ -31,7 +28,7 @@ export class UserController {
     return await this.userService.reserveConcert(reservetDto);
   }
 
-  @Post('reserve')
+  @Post('cancel')
   async cencelConcert(@Body() canceltDto: CancelDto) {
     return await this.userService.cencelConcert(canceltDto);
   }

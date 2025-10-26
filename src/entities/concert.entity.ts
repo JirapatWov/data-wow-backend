@@ -24,7 +24,7 @@ export class Concert {
   @Column()
   reserved: number;
 
-  @Column()
+  @Column({ nullable: true })
   expires_at: Date;
 
   @CreateDateColumn()

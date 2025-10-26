@@ -29,4 +29,9 @@ export class AdminController {
   async getTransactions() {
     return await this.adminService.getTransactions();
   }
+
+  @Get('totals')
+  async getConcertTotals() {
+    return await this.adminService.getConcertTotals();
+  }
 }

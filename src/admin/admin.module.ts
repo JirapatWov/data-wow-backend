@@ -9,6 +9,5 @@ import { Transaction } from 'src/entities/transaction.entity';
   imports: [TypeOrmModule.forFeature([Concert, Transaction])],
   providers: [AdminService],
   controllers: [AdminController],
-  exports: [AdminService],
 })
 export class AdminModule {}
